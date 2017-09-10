@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.camork.mapper.BookMapper">
+
+    <insert id="insertBookType" parameterType="BookType">
+        INSERT IGNORE INTO b_type (type_title, type_name, type_url) VALUES (#{typeTitle}, #{typeName}, #{url})
+    </insert>
+
+    <insert id="insertBook" parameterType="cn.camork.crawler.Book">
+        INSERT IGNORE INTO b_books (book_id, type_name, book_name, book_price, book_author, book_publisher, book_pic, book_pubdate, book_describe)
+        VALUES (#{bookId}, #{typeName}, #{bookName}, #{bookPrice}, #{bookAuthor}, #{publisher}, #{bookPic}, #{pubDate}, #{bookDescribe})
+    </insert>
+
+    <select id="getHotBooks" resultType="BookBean">
+        SELECT
+            book_id        bookId,
+            type_name      typeName,
+            book_name      bookName,
+            book_price     bookPrice,
+            book_author    bookAuthor,
+            book_publisher publisher,
+            book_pic       bookPic,
+            book_describe  bookDescribe
+        FROM b_books
+        WHERE type_name = "book.douban.com"
+        ORDER BY book_pubdate DESC
+        LIMIT 24
+    </select>
+
+    <select id="getBookTypes" resultType="BookType">
+        SELECT
+            type_title typeTitle,
+            type_name  typeName,
+            type_url   url
+        FROM b_type
+        WHERE type_title != ''
+    </select>
+
+    <select id="getBooksByType" resultType="BookBean">
+        SELECT
+            book_id        bookId,
+            type_name      typeName,
+            book_name      bookName,
+            book_price     bookPrice,
+            book_author    bookAuthor,
+            book_publisher publisher,
+            book_pic       bookPic,
+            book_describe  bookDescribe
+        FROM b_books
+        WHERE type_name = #{0}
+        ORDER BY book_pubdate DESC
+        LIMIT 9
+    </select>
+
+</mapper>

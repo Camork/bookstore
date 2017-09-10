@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.camork.mapper.OrderMapper">
+    <insert id="saveOrder" parameterType="Order">
+        INSERT INTO b_orders (user_name, order_code, order_status, order_date, totalAmount, totalNumber)
+        VALUES (#{userName}, #{orderCode}, #{orderStatus}, #{orderDate}, #{totalAmount}, #{totalNumber})
+    </insert>
+
+    <insert id="saveOrderDetail">
+        INSERT INTO b_orderdetail (order_id, book_id, order_price, book_name, book_num, book_pic)
+        VALUES (#{orderId}, #{bookId}, #{orderPrice}, #{bookName}, #{bookNum}, #{bookPic})
+    </insert>
+
+    <select id="getOrderId" resultType="Integer">
+        SELECT order_id
+        FROM b_orders
+        WHERE order_code = #{0}
+    </select>
+
+    <update id="updateOrderStatus">
+        UPDATE b_orders
+        SET order_status = #{param2}
+        WHERE order_id = #{param1}
+    </update>
+
+    <resultMap id="OrderResultMap" type="Order">
+        <id property="orderId" column="order_id"/>
+        <result property="orderCode" column="order_code"/>
+        <result property="userName" column="user_name"/>
+        <result property="orderStatus" column="order_status"/>
+        <result property="orderDate" column="order_date"/>
+        <result property="totalAmount" column="totalAmount"/>
+        <result property="totalNumber" column="totalNumber"/>
+        <collection property="odetails" ofType="OrderDetail">
+            <id property="odetailId" column="odetail_id"/>
+            <result property="orderId" column="order_id"/>
+            <result property="bookId" column="book_id"/>
+            <result property="bookName" column="book_name"/>
+            <result property="orderPrice" column="order_price"/>
+            <result property="bookNum" column="book_num"/>
+            <result property="bookPic" column="book_pic"/>
+        </collection>
+    </resultMap>
+
+    <select id="getMyOrders" resultMap="OrderResultMap">
+        select o.order_id,
+        order_code,
+        user_name,
+        order_status,
+        order_date,
+        totalAmount,
+        totalNumber,
+        odetail_id,
+        book_id,
+        book_name,
+        order_price,
+        book_num,
+        book_pic
+        from b_orders o join b_orderdetail od
+        on o.order_id=od.order_id
+        <if test="param1!=null">
+            where user_name=#{param1}
+            <if test="param2!=null">
+                and order_status=#{param2}
+            </if>
+        </if>
+        <if test="param1==null">
+            <if test="param2!=null">
+                where order_status=#{param2}
+            </if>
+        </if>
+        order by order_code desc
+    </select>
+
+    <select id="findOrderStatusById" parameterType="int" resultType="int">
+        SELECT order_status
+        FROM b_orders
+        WHERE order_id = #{orderId}
+    </select>
+
+    <delete id="delOrder">
+        DELETE FROM b_orders
+        WHERE order_id = #{param1}
+    </delete>
+</mapper>

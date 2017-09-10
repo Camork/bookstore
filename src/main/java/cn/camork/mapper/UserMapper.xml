@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.camork.mapper.UserMapper">
+
+    <select id="userLogin" parameterType="String" resultType="UserBean">
+        SELECT
+            user_name userName,
+            user_pass userPass,
+            user_role userRole
+        FROM b_users
+        WHERE user_name = #{userName}
+    </select>
+
+    <insert id="regUser" parameterType="UserBean">
+        INSERT INTO b_users (user_name, user_pass, user_role) VALUES (#{userName}, #{userPass}, 0)
+    </insert>
+
+    <select id="checkUserName" parameterType="UserBean" resultType="Integer">
+        SELECT user_id
+        FROM b_users
+        WHERE user_name = #{userName}
+    </select>
+
+</mapper>
